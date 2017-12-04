@@ -1,0 +1,30 @@
+{
+  "order": 0,
+  "template": "todone-tasks",
+  "settings": {
+    "index": {
+      "number_of_shards": "1",
+      "number_of_replicas": "1"
+    }
+  },
+  "mappings": {
+    "task": {
+      "properties": {
+        "description": { "type": "string" },
+        "duedate": { "type": "date" },
+        "complete": { "type": "boolean" },
+        "context": {
+          "type": "object",
+          "properties": {
+            "project": { "type": "string" },
+            "worktype": { "type": "string" },
+            "location": { "type": "string" },
+            "aof": { "type": "string" },
+            "goal": { "type": "string" }
+          }
+        }
+      }
+    }
+  },
+  "aliases": {}
+}
