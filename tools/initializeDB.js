@@ -6,15 +6,17 @@ const Promise = require('bluebird');
 const mappings = require('./task-mappings.json');
 const tasks = require('./data/tasks.json');
 
-console.log(`elasticsearch host = ${config.get('elasticsearch').host}`)
 const esClient = new es.Client({ host: config.get('elasticsearch').host });
 
-// console.log(JSON.stringify(tasks, null, 2));
-
 const safeDelete = (index) =>
-    esClient.indices.exists({ index })
-      .then(exists => exists ? esClient.indices.delete({ index }) : {})
-      .catch(console.log);
+  esClient.indices.exists({ index })
+    .then(exists => exists ? esClient.indices.delete({ index }) : Promise.resolve());
+
+const createIndex = (index, settings) =>
+  esClient.indices.create({ index, body: settings });
+
+const index = 'todone-tasks';
+const type = 'task';
 
 /* eslint-disable no-underscore-dangle */
 const bulkRequestBuilder = R.compose(
@@ -22,27 +24,18 @@ const bulkRequestBuilder = R.compose(
   R.map(item => [
     {
       index: {
-        _index: 'todone-task',
-        _type: 'task'
+        _index: index,
+        _type: type
       }
     },
-    item
+    R.omit(['id'], item)
   ])
 );
 /* eslint-enable */
 
-const delay = 5000;
-const index = 'todone-tasks';
+const bulkTest = bulkRequestBuilder(tasks);
 
-Promise.resolve(esClient.indices.exists({ index })).tap(console.log)
-  .then(exists => {
-    if (exists) {
-      return esClient.indices.delete({ index });
-    }
-    else {
-      return Promise.resolve();
-    }
-  })
-  .then(esClient.indices.exists({ index }).then(console.log))
-  .then(esClient.indices.create({ index: 'todone-tasks', body: mappings }))
+safeDelete(index)
+  .then(() => createIndex(index, mappings))
+  .then(() => esClient.bulk({ body: bulkRequestBuilder(tasks) }))
   .catch(console.log);

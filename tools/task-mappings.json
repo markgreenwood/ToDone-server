@@ -10,17 +10,17 @@
   "mappings": {
     "task": {
       "properties": {
-        "description": { "type": "string" },
+        "description": { "type": "text" },
         "duedate": { "type": "date" },
         "complete": { "type": "boolean" },
         "context": {
           "type": "object",
           "properties": {
-            "project": { "type": "string" },
-            "worktype": { "type": "string" },
-            "location": { "type": "string" },
-            "aof": { "type": "string" },
-            "goal": { "type": "string" }
+            "project": { "type": "text" },
+            "worktype": { "type": "text" },
+            "location": { "type": "text" },
+            "aof": { "type": "text" },
+            "goal": { "type": "text" }
           }
         }
       }
