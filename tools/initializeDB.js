@@ -15,6 +15,16 @@ const safeDelete = (index) =>
 const createIndex = (index, settings) =>
   esClient.indices.create({ index, body: settings });
 
+const recreateIndex = async (index, settings) => {
+  const exists = await esClient.indices.exists({ index });
+
+  if (exists) {
+    await esClient.indices.delete({ index });
+  }
+
+  return esClient.indices.create({ index, body: settings });
+};
+
 const index = 'todone-tasks';
 const type = 'task';
 
@@ -35,7 +45,6 @@ const bulkRequestBuilder = R.compose(
 
 const bulkTest = bulkRequestBuilder(tasks);
 
-safeDelete(index)
-  .then(() => createIndex(index, mappings))
+recreateIndex(index, mappings)
   .then(() => esClient.bulk({ body: bulkRequestBuilder(tasks) }))
   .catch(console.log);
