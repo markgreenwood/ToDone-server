@@ -20,6 +20,9 @@
     "eslint-loader": "^1.9.0"
   },
   "dependencies": {
+    "config": "^1.28.1",
+    "hapi": "^17.1.1",
+    "js-yaml": "^3.10.0",
     "moment": "^2.19.3"
   }
 }
