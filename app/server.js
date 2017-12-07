@@ -11,6 +11,28 @@ const { host, port } = config.get('hapiServer');
 
 const server = Hapi.server({ host, port });
 
+const tasksApi = {
+  name: 'tasksApi',
+  version: '1.0.0',
+  register: (server, options) => {
+    server.route({
+      method: 'GET',
+      path: '/tasks',
+      handler: (request, h) =>
+        esClient.search({ index: 'todone-tasks', type: 'task' })
+          .then(resp => R.map(item => item._source, resp.hits.hits))
+    });
+
+    server.route({
+      method: 'GET',
+      path: '/tasks/{id}',
+      handler: (request, h) =>
+        esClient.get({ index: 'todone-tasks', type: 'task', id: request.params.id })
+          .then(resp => resp._source)
+    });
+  }
+};
+
 server.route({
   method: 'GET',
   path: '/',
@@ -29,21 +51,16 @@ server.route({
   handler: (request, h) => ({ status: 'ok', service: 'ToDone-server', version: pkg.version })
 });
 
-server.route({
-  method: 'GET',
-  path: '/tasks',
-  handler: (request, h) =>
-    esClient.search({ index: 'todone-tasks', type: 'task' })
-      .then(resp => R.map(item => item._source, resp.hits.hits))
-});
-
-server.route({
-  method: 'GET',
-  path: '/tasks/{id}',
-  handler: (request, h) =>
-    esClient.get({ index: 'todone-tasks', type: 'task', id: request.params.id })
-      .then(resp => resp._source)
-})
+async function registerPlugins() {
+  try {
+    await server.register({ plugin: tasksApi });
+  }
+  catch (err) {
+    console.log(err);
+    process.exit(1);
+  }
+  console.log('Plugins registered\n');
+}
 
 async function start() {
   try {
@@ -56,4 +73,4 @@ async function start() {
   console.log(`Server running at ${server.info.uri}`);
 }
 
-start();
+registerPlugins().then(() => start());
