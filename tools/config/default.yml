@@ -1,2 +1,2 @@
 elasticsearch:
-  host: 'localhost:9200'
+  host: 'search-sensei-test-db-nir5zfe457sedoys4i33ni5jma.us-west-2.es.amazonaws.com'

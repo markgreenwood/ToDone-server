@@ -24,6 +24,7 @@
     "elastic-builder": "^1.1.3",
     "elasticsearch": "^14.0.0",
     "hapi": "^17.1.1",
+    "hapi-swagger": "^8.0.0",
     "js-yaml": "^3.10.0",
     "moment": "^2.19.3",
     "ramda": "^0.25.0"
